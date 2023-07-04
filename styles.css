@@ -1,0 +1,12 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#questionnaire {
+    margin-bottom: 2em;
+}
+
+#recommendation {
+    padding: 2em;
+    background-color: #f9f9f9;
+}

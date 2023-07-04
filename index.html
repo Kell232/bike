@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bike Recommendation</title>
+    <style>
+        /* Add your CSS styles here */
+    </style>
+</head>
+<body>
+    <div id="questionnaire">
+        <h1>Questionnaire</h1>
+        <form id="bikeForm">
+            <label for="distance">Average distance per ride:</label>
+            <select id="distance" name="distance">
+                <option value="15">Up to 15 miles</option>
+                <option value="100">15-100 miles</option>
+                <option value="101">Over 100 miles</option>
+            </select>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <div id="recommendation">
+        <!-- Recommendation will be displayed here -->
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
