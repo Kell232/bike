@@ -1,27 +1,186 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Bike Recommendation</title>
-    <style>
-        /* Add your CSS styles here */
-    </style>
-</head>
 <body>
-    <div id="questionnaire">
-        <h1>Questionnaire</h1>
-        <form id="bikeForm">
-            <label for="distance">Average distance per ride:</label>
-            <select id="distance" name="distance">
-                <option value="15">Up to 15 miles</option>
-                <option value="100">15-100 miles</option>
-                <option value="101">Over 100 miles</option>
-            </select>
-            <input type="submit" value="Submit">
-        </form>
-    </div>
-    <div id="recommendation">
-        <!-- Recommendation will be displayed here -->
-    </div>
-    <script src="app.js"></script>
+
+<h2>E-bike recommendation tool</h2>
+
+<p>Select your preferences:</p>
+
+<form id="surveyForm">
+  <label for="distance">How far will you travel on a single ride?</label><br>
+  <select id="distance" onchange="enableBudget()">
+    <option value="" disabled selected>Select an option</option>
+    <option value="300">Less than 5 miles</option>
+    <option value="400">Between 6 & 10 miles</option>
+    <option value="500">Between 11 & 25 miles</option>
+    <option value="501">Over 25 miles</option>
+  </select><br>
+  
+  <label for="budget">What is your estimated budget?</label><br>
+  <select id="budget" disabled onchange="enableFrameShape()">
+    <option value="" disabled selected>Select an option</option>
+    <option value="800">Up to £800</option>
+    <option value="1500">£800-£1500</option>
+    <option value="3000">£1500-£3000</option>
+    <option value="3001">£3000+</option>
+    <option value="999999">No budget</option>
+  </select><br>
+
+  <label for="frameShape">Do you have a frame shape preference?</label><br>
+  <select id="frameShape" disabled onchange="enableSubmit()">
+    <option value="" disabled selected>Select an option</option>
+    <option value="crossbar">Crossbar</option>
+    <option value="low step">Low Step</option>
+    <option value="folding">Folding</option>
+    <option value="any">No Preference</option>
+  </select><br>
+  
+  <input type="button" id="submitButton" value="Submit" onclick="getRecommendations()" disabled>
+</form>
+
+<p id="recommendedBikes"></p>
+
+<script>
+// Bike data goes here
+const bikes = [
+  {
+    name: 'e-Urban 6.5',
+    brand: 'Lapierre',
+    batterySize: 500,
+    price: 2649,
+    frameShape: 'low step',
+    url: 'https://www.lapierrebikes.com/gb-en/o/e-urban-65/'
+  },
+  {
+    name: 'e-Shaper 3.2',
+    brand: 'Lapierre',
+    batterySize: 250,
+    price: 2399,
+    frameShape: 'crossbar',
+    url: 'https://www.lapierrebikes.com/gb-en/o/e-shaper-32-2023/'
+  },
+  {
+    name: 'Overvolt HT 5.5',
+    brand: 'Lapierre',
+    batterySize: 500,
+    price: 2599,
+    frameShape: 'crossbar',
+    url: 'https://www.lapierrebikes.com/gb-en/o/overvolt-ht-55-2022/'
+  },
+  {
+    name: 'Overvolt HT 5.4 Mix',
+    brand: 'Lapierre',
+    batterySize: 400,
+    price: 2399,
+    frameShape: 'low step',
+    url: 'https://www.lapierrebikes.com/gb-en/o/overvolt-ht-54-mix-2023/'
+  },
+  {
+    name: 'Pro Cargo Bike',
+    brand: 'Raleigh',
+    batterySize: 500,
+    price: 4950,
+    frameShape: 'crossbar',
+    url: 'https://www.raleigh.co.uk/gb/en/pro-cargo-bike/'
+  },
+  {
+    name: 'Centros Hub Gear',
+    brand: 'Raleigh',
+    batterySize: 625,
+    price: 3099,
+    frameShape: 'low step',
+    url: 'https://www.raleigh.co.uk/gb/en/centros-hub-gear/low-step/'
+  },
+  {
+    name: 'Centros Hub Gear',
+    brand: 'Raleigh',
+    batterySize: 625,
+    price: 3099,
+    frameShape: 'crossbar',
+    url: 'https://www.raleigh.co.uk/gb/en/centros-hub-gear/crossbar/'
+  },
+  {
+    name: 'Stow-E-Way',
+    brand: 'Raleigh',
+    batterySize: 250,
+    price: 999,
+    frameShape: 'folding',
+    url: 'https://www.raleigh.co.uk/gb/en/stow-e-way-folding-electric-bike/'
+  },
+  {
+    name: 'Motus Tour - Derailleur Gear',
+    brand: 'Raleigh',
+    batterySize: 500,
+    price: 2499,
+    frameShape: 'crossbar',
+    url: 'https://www.raleigh.co.uk/gb/en/motus-tour-derailleur-gear-electric-bike/crossbar/'
+  },
+  {
+    name: 'Motus Tour - Derailleur Gear',
+    brand: 'Raleigh',
+    batterySize: 500,
+    price: 2499,
+    frameShape: 'low step',
+    url: 'https://www.raleigh.co.uk/gb/en/motus-tour-derailleur-gear-electric-bike/low-step/'
+  },
+  {
+    name: 'AllMtn CF SE',
+    brand: 'Haibike',
+    batterySize: 750,
+    price: 7699,
+    frameShape: 'crossbar',
+    url: 'https://www.haibike.com/gb/en/electric-bikes/electric-mountain-bikes/electric-allmountain-bikes/allmtn-cf-se-gb684?id=45166241'
+  },
+  {
+    name: 'Trekking 3',
+    brand: 'Haibike',
+    batterySize: 500,
+    price: 2749,
+    frameShape: 'crossbar',
+    url: 'https://www.haibike.com/gb/en/electric-bikes/electric-trekking-bikes/trekking-3-high-gb739?id=45500330'
+  },
+  {
+    name: 'Trekking 3',
+    brand: 'Haibike',
+    batterySize: 500,
+    price: 2749,
+    frameShape: 'low step',
+    url: 'https://www.haibike.com/gb/en/electric-bikes/electric-trekking-bikes/trekking-3-mid-gbv015?id=45504330'
+  },
+  /* ... your bike data ... */
+];
+
+function enableBudget() {
+  document.getElementById('budget').disabled = false;
+}
+
+function enableFrameShape() {
+  document.getElementById('frameShape').disabled = false;
+}
+
+function enableSubmit() {
+  document.getElementById('submitButton').disabled = false;
+}
+
+function getRecommendations() {
+  const distance = parseInt(document.getElementById('distance').value);
+  const budget = parseInt(document.getElementById('budget').value);
+  const frameShape = document.getElementById('frameShape').value;
+  
+  let recommendations = bikes.filter(bike => bike.batterySize <= distance && bike.price <= budget);
+  
+  if(frameShape !== 'any') {
+    recommendations = recommendations.filter(bike => bike.frameShape === frameShape);
+  }
+
+  if (recommendations.length === 0) {
+    document.getElementById('recommendedBikes').innerHTML = "No bikes found matching your criteria.";
+  } else {
+    const output = recommendations.slice(0, 3).map(bike => `${bike.name} - ${bike.brand} - £${bike.price} - <a href="${bike.url}" target="_blank">View here</a>`).join('<br>');
+    document.getElementById('recommendedBikes').innerHTML = output;
+  }
+}
+</script>
+
 </body>
 </html>
